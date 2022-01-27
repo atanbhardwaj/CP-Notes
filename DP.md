@@ -60,3 +60,7 @@ int main()
     return 0;
 }
 ```
+**Complexity Analysis**
+
+- **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
+- **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
