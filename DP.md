@@ -34,6 +34,8 @@ of items that result in the maximum profit and it is also possible that it is no
 
 **Code:**
 ```C++
+#include <bits/stdc++.h>
+using namespace std;
 /**
  * @param W array of item weights
  * @param P array of item profits
