@@ -124,8 +124,8 @@ int knapsack(const vector<int> &W, const vector<int> &P, int Space, int i)
 	if (W[i] > Space)
 		return dp[{i, Space}] = knapsack(W, P, Space, i - 1); //Exclude the item
 	else
-		return dp[{i, Space}] = max(knapsack(W, P, Space, i - 1),				 //Exclude the item
-									P[i] + knapsack(W, P, Space - W[i], i - 1)); //Include the item
+		return dp[{i, Space}] = max(knapsack(W, P, Space, i - 1),		 //Exclude the item
+					    P[i] + knapsack(W, P, Space - W[i], i - 1)); //Include the item
 }
 
 int main()
@@ -141,3 +141,66 @@ int main()
 
 - **Time complexity: O(n\*C)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible queries is n\*C (For each item, we have to explore for all capacities <= C)
 - **Space complexity: O(n\*C + size of recursive call stack)** - We are caching n\*C results in our Hash Map.
+
+
+### Bottom-Up (Tabular)
+In order to understand this approach, we need to refer back to the recurrence relation (how and when we call the recursive calls) we used in the Top-down method.
+```
+//Base case:
+dp(i, 0) = 0
+dp(-1, Space) = 0
+
+//Recurrence Relation
+if (W[i] > Space)
+    dp(i, Space) = dp(i-1, Space)
+else
+    dp(i, Space) = max(dp(i-1, Space), P[i] + dp(i-1, Space - W[i]))
+```
+We know that `i` will be in the range of `[0, n-1]` and Space will be in the range of `[1, C]`. We can use this to change dp into a 2D matrix/array for caching the results. In addition, we will be generating the answer from the bottom up (i.e. calculating and storing the results of smaller sub problems then using those to calculate and store the larger ones). In top down, we start from the top (the answer we need, and recursively call the small sub problems), but here, we start from the bottom.
+
+One more point to note is that, our base case checks to see if i is -1 which we can't use if we have an array (since they only go to index 0). Therefore, we will shift the values of i by +1 (make it 1 indexed) and reserve 0 for the -1 case (basically, in the code, dp[0]\[Space] = 0 since 0 works like -1)
+
+
+**Code: (C++)**
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+/**
+ * @param W array of item weights
+ * @param P array of item profits
+ * @param C capacity of the bag
+*/
+int knapsack(const vector<int> &W, const vector<int> &P, int C)
+{
+	int n = W.size();
+
+	vector<vector<int>> dp(n + 1, vector<int>(C + 1));
+	//dp[0][Space] = 0 (by default in vector)
+	//dp[i][0] = 0 (by default in vector)
+	for (int i = 1; i <= n; ++i)
+	{
+		for (int Space = 1; Space <= C; ++Space)
+		{
+			if (W[i - 1] > Space)
+				dp[i][Space] = dp[i - 1][Space];
+			else
+				dp[i][Space] = max(dp[i - 1][Space], P[i - 1] + dp[i - 1][Space - W[i - 1]]);
+		}
+	}
+
+	return dp[n][C];
+}
+int main()
+{
+    vector<int> W = {7, 2, 4}, P = {10, 5, 6};
+    int C = 7;
+    cout << knapsack(W, P, C, W.size() - 1);
+
+    return 0;
+}
+```
+**Complexity Analysis**
+
+- **Time complexity: O(n\*C)** - We have 2 nested for loops that run in total of n*\C times.
+- **Space complexity: O(n\*C)** - We are caching n\*C results in our 2D matrix/array.
+
