@@ -32,7 +32,7 @@ of items that result in the maximum profit and it is also possible that it is no
 **0/1 Knapsack Recursive Decision Tree** ([Source](https://youtu.be/mGfK-j9gAQA?list=PLEJXowNB4kPxBwaXtRO1qFLpCzF75DYrS&t=1082)):
 ![0/1 Knapsack Recursive Decision Tree](https://github.com/AyushKoul00/CP-Notes/blob/main/01_Knapsack_DT.PNG?raw=true)
 
-**Code:**
+**Code: (C++)**
 ```C++
 #include <bits/stdc++.h>
 using namespace std;
@@ -66,3 +66,78 @@ int main()
 
 - **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
 - **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
+
+
+### Recursive (Top-down) + Memoization
+If we notice, out recursive function only depends on two things: the items we choose (`i`) and the current capacity of the bag (`Space`). The weights and profit arrays remain constant in each call (we could choose to make them global as well). Therefore, if we think of the recursive call as `knapsack(Space, i)` then we can see that out recursive function re-calculates a call with the same parameters multiple times. Example:
+
+```
+In the following recursion tree, K(a, b) refers 
+to knapSack(Space, i).
+The recursion tree is for following sample inputs.
+W[] = {1, 1, 1}, P[] = {10, 20, 30}, C = 2
+
+                       K(C, n-1)
+                       K(2, 3)  
+                   /            \ 
+                 /                \               
+            K(2, 2)                  K(1, 2)
+          /       \                  /    \ 
+        /           \              /        \
+       K(2, 1)      K(1, 1)        K(1, 1)     K(0, 1)
+       /  \         /   \              /        
+     /      \     /       \          /            
+K(2, 0)  K(1, 0)  K(1, 0)  K(0, 0)  K(1, 0)   
+```
+
+We can see that K(1, 1) is calculated multiple times. Eventhough it may seem like a small calculation from the example, it is actually very expensive. Imagine if the tree was very deep and we can to calculate the same sub-problems (aka sub-calls) multiple times, it would make the time complexity exponential (which is seen in the brute-force approach). Caching the result saves this time and only explores new sub-problems/sub-calls that haven't been cached.
+
+**Code: (C++)**
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+// A hash function used to hash a pair of any kind
+struct hash_pair {
+    template <class T1, class T2>
+    size_t operator()(const pair<T1, T2>& p) const
+    {
+        auto hash1 = hash<T1>{}(p.first);
+        auto hash2 = hash<T2>{}(p.second);
+        return hash1 ^ hash2;
+    }
+};
+unordered_map<pair<int, int>, int, hash_pair> dp;
+
+/**
+ * @param W array of item weights
+ * @param P array of item profits
+ * @param Space current capacity of the bag (before choosing item i)
+ * @param i current item index (start from n-1)
+*/
+int knapsack(const vector<int> &W, const vector<int> &P, int Space, int i)
+{
+	if(dp.find({i, Space}) != dp.end())
+		return dp[{i, Space}];
+	if (i == -1 || Space == 0)
+		return dp[{i, Space}] = 0;
+	if (W[i] > Space)
+		return dp[{i, Space}] = knapsack(W, P, Space, i - 1); //Exclude the item
+	else
+		return dp[{i, Space}] = max(knapsack(W, P, Space, i - 1),				 //Exclude the item
+									P[i] + knapsack(W, P, Space - W[i], i - 1)); //Include the item
+}
+
+int main()
+{
+    vector<int> W = {7, 2, 4}, P = {10, 5, 6};
+    int C = 7;
+    cout << knapsack(W, P, C, W.size() - 1);
+
+    return 0;
+}
+```
+**Complexity Analysis**
+
+- **Time complexity: O(n\*C)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible queries is n\*C (For each item, we have to explore for all capacities <= C)
+- **Space complexity: O(n\*C + size of recursive call stack)** - We are caching n\*C results in our Hash Map.
