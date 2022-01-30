@@ -216,7 +216,7 @@ Find the minimum possible total cost incurred before the frog reaches Stone `N`.
 Given:
 
 - `N`
-- h<sub>1</sub> h<sub>2</sub> … h <sub>N</sub>
+- **h<sub>1</sub> h<sub>2</sub> … h <sub>N</sub>**
 
 ### Brute-Force/Recursive Approach
 
@@ -258,3 +258,8 @@ int32_t main()
     cout << answer;
 }
 ``` 
+
+**Complexity Analysis**
+
+- **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
+- **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
