@@ -1,5 +1,6 @@
 # Dynamic Programming
 
+<a name="01ks"></a>
 ## 0/1 Knapsack
 
 ### Problem Statement:
@@ -228,15 +229,23 @@ int main()
 <br />
 <br />
 
+
+
+
+
+
 ## Atcoder Educational Dp Contest
 
+<a name="frog_1"></a>
 ### [Frog1](https://atcoder.jp/contests/dp/tasks/dp_a)
 
 #### Problem Statement
-There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is **h<sub>i</sup>**. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
-If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of **∣h<sub>i</sub> − h<sub>j</sub>∣** is incurred, where `j` is the stone to land on. 
-Find the minimum possible total cost incurred before the frog reaches Stone `N`.
+There are `N` stones, numbered `1,2,…,N`. For each `i (1 <= i <= N)`, the height of Stone `i` is `hi`. 
 
+There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
+- If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of `|hi - hj|` is incurred, where `j` is the stone to land on. 
+
+Find the minimum possible total cost incurred before the frog reaches Stone `N`.
 
 Given:
 - `N`
@@ -367,6 +376,180 @@ int main()
 		cin >> h[i];
 
 	cout << bottomup(h);
+	return 0;
+}
+```
+
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - We have single for loop that run in total of n times.
+- **Space complexity: O(n)** - We are caching n results in our DP array.
+
+
+
+
+
+
+<br />
+<br />
+<br />
+<br />
+
+
+
+
+
+
+
+<a name="frog_2"></a>
+### [Frog2](https://atcoder.jp/contests/dp/tasks/dp_b)
+
+#### Problem Statement
+There are `N` stones, numbered `1,2,…,N`. For each `i (1 <= i <= N)`, the height of Stone `i` is `hi`. 
+
+There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
+- If the frog is currently on Stone `i`, jump to one of the following: Stone `i+1`,`i+2`,…,`i+K`. Here, a cost of `|hi - hj|` is incurred, where `j` is the stone to land on. 
+
+Find the minimum possible total cost incurred before the frog reaches Stone `N`.
+
+Given:
+- `N`
+- `K`
+- `h1, h2, ... hN`
+
+#### Brute-Force/Recursive Approach
+Similar to [Frog1](#frog_1), we know that if a frog can jump `k` stones ahead from a stone `i`, this also implies that a frog can only reach stone `i` by jumping from the previous `k` stones.
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int recursive(vector<int> &h, int k, int i)
+{
+	if (i == 0)
+		return 0;
+
+	int res = INT_MAX;
+	for (int j = max(0, i - k); j < i; ++j)
+		res = min(res, abs(h[i] - h[j]) + recursive(h, k, j));
+
+	return res;
+}
+
+int main()
+{
+	int n, k;
+	cin >> n >> k;
+	vector<int> h(n);
+	for (int i = 0; i < n; ++i)
+		cin >> h[i];
+
+	cout << recursive(h, k, n-1);
+	return 0;
+}
+``` 
+
+**Complexity Analysis**
+
+- **Time complexity: O(n<sup>k</sup>)** - Size of recursion tree will be n<sup>k</sup>
+- **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
+
+<br />
+<br />
+
+#### Recursive (Top-down) + Memoization
+
+Here, we cache the results of the recursive brute-force approach to reduce time complexity:
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int topdown(vector<int> &h, int k, int i)
+{
+	static vector<int> dp(h.size(), -1);
+	if (dp[i] != -1)
+		return dp[i];
+	if (i == 0)
+		return dp[i] = 0;
+
+	int res = INT_MAX;
+	for (int j = max(0, i - k); j < i; ++j)
+		res = min(res, abs(h[i] - h[j]) + topdown(h, k, j));
+
+	return dp[i] = res;
+}
+
+int main()
+{
+	int n, k;
+	cin >> n >> k;
+	vector<int> h(n);
+	for (int i = 0; i < n; ++i)
+		cin >> h[i];
+
+	cout << topdown(h, k, n-1);
+	return 0;
+}
+```
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible calls is n (We have to explore each stone)
+
+- **Space complexity: O(n + size of recursive call stack)** - We are caching n results in our DP array.
+
+<br />
+<br />
+
+#### Bottom-Up (Tabular)
+
+From the recurrence relation, we can come up with the bottom up approach:
+```
+Base Case:
+if (i == 0)
+	return 0;
+	
+Recurrence Relation:
+	dp[i] = max(dp[i], abs(h[i] - h[j]) + dp[j]) -> for all j in range [i-k, i)
+```
+
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int bottomup(vector<int> &h, int k)
+{
+	int n = h.size();
+	vector<int> dp(n, INT_MAX);
+
+	dp[0] = 0;
+	for (int i = 1; i < n; ++i)
+	{
+		for(int j = max(0, i - k); j < i; ++j)
+			dp[i] = min(dp[i], abs(h[i] - h[j]) + dp[j]);
+	}
+
+	return dp[n - 1];
+}
+ 
+int main()
+{
+	int n, k;
+	cin >> n >> k;
+	vector<int> h(n);
+	for (int i = 0; i < n; ++i)
+		cin >> h[i];
+
+	cout << bottomup(h, k);
 	return 0;
 }
 ```
