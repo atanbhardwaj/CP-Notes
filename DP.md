@@ -278,11 +278,30 @@ int32_t main()
 
 ### Recursive (Top-down) + Memoization
 
+Let us take an example:
+Say `N` is given as `4` and the height array is given {heights} `10 30 40 20` . Now according to our previous solution which explored all the possible options, the recurrence tree would look like as below:
+
+```
+                                R(heights,totalCost, cost, index, n)
+                                    K(heights,INT_MAX,0, 0, 4)  
+                                    /                       \ 
+                                    /                       \               
+                R(h,INT_MAX,20, 1, 4)                  R(h,INT_MAX,30, 2, 4) 
+                    /           \                           /               \ 
+                    /           \                           /                   \
+    R(h,INT_MAX,30, 2, 4)      R(h,INT_MAX,40,3,4)    R(h,INT_MAX,50,3 ,4)       [Restricted call due index out of bound]
+        /           \               /   \              /        
+        /               \           /       \          /            
+R(h,INT_MAX,50,3, 4)      [Restricted calls due index out of bound]              
+```
+Now, as we can see that `R(h,INT_MAX,30, 2, 4)` and `R(h,INT_MAX,50,3 ,4)` function calls are repeated multiple times. So, we just need to cache this result once calculated to avoid repeating the same call. Hence, we can define our dp array which is going to cache the result of each state which defines at a certain index what is the minimum possible cost incurred and the dp array is of size `n` because we have total `n` stones given. So, just add a dp array and memoize the result once calculated and then before calculating the result just check if dp array has the answer already or not. If yes, then return the stored answer and no need to make the function call. Else compute the result.
+
+
 ```C++
 #include <bits/stdc++.h>
 using namespace std;
 
-int minimumPossibleCostIncurred(int *arr, int index, int *dp, int n)
+int minimumPossibleCostIncurred(int *height, int index, int *dp, int n)
 {
     if (index >= n - 1)
         return 0;
@@ -292,10 +311,10 @@ int minimumPossibleCostIncurred(int *arr, int index, int *dp, int n)
 
     int costOne = INT_MAX, costTwo = INT_MAX;
 
-    costOne = abs(arr[index] - arr[index + 1]) + minimumPossibleCostIncurred(arr, index + 1, dp, n);
+    costOne = abs(height[index] - height[index + 1]) + minimumPossibleCostIncurred(height, index + 1, dp, n);
 
     if (index + 2 < n)
-        costTwo = abs(arr[index] - arr[index + 2]) + minimumPossibleCostIncurred(arr, index + 2, dp, n);
+        costTwo = abs(height[index] - height[index + 2]) + minimumPossibleCostIncurred(height, index + 2, dp, n);
 
     return dp[index] = min(costOne, costTwo);
 }
@@ -304,16 +323,16 @@ int32_t main()
 {
     int n;
     cin >> n;
-    int arr[n];
+    int height[n];
     for (int i = 0; i < n; i++)
-        cin >> arr[i];
+        cin >> height[i];
         
     int dp[n];
 
     for (int i = 0; i < n; i++)
         dp[i] = INT_MAX;
 
-    cout << minimumPossibleCostIncurred(arr, 0, dp, n);
+    cout << minimumPossibleCostIncurred(height, 0, dp, n);
 
 }
 ```
