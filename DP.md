@@ -205,7 +205,7 @@ int main()
 - **Space complexity: O(n\*C)** - We are caching n\*C results in our 2D matrix/array.
 
 
-## Frog 1 [Atcoder Educational Dp Contest]
+## <a href="https://atcoder.jp/contests/dp/tasks/dp_a"> Frog 1</a> [Atcoder Educational Dp Contest]
 
 ### Problem Statement
 There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is **h<sub>i</sup>**. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
@@ -273,3 +273,47 @@ int32_t main()
 
 - **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
 - **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
+
+
+
+### Recursive (Top-down) + Memoization
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int minimumPossibleCostIncurred(int *arr, int index, int *dp, int n)
+{
+    if (index >= n - 1)
+        return 0;
+
+    if (dp[index] != INT_MAX)
+        return dp[index];
+
+    int costOne = INT_MAX, costTwo = INT_MAX;
+
+    costOne = abs(arr[index] - arr[index + 1]) + minimumPossibleCostIncurred(arr, index + 1, dp, n);
+
+    if (index + 2 < n)
+        costTwo = abs(arr[index] - arr[index + 2]) + minimumPossibleCostIncurred(arr, index + 2, dp, n);
+
+    return dp[index] = min(costOne, costTwo);
+}
+
+int32_t main()
+{
+    int n;
+    cin >> n;
+    int arr[n];
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
+        
+    int dp[n];
+
+    for (int i = 0; i < n; i++)
+        dp[i] = INT_MAX;
+
+    cout << minimumPossibleCostIncurred(arr, 0, dp, n);
+
+}
+```
