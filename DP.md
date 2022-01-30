@@ -201,6 +201,6 @@ int main()
 ```
 **Complexity Analysis**
 
-- **Time complexity: O(n\*C)** - We have 2 nested for loops that run in total of n*\C times.
+- **Time complexity: O(n\*C)** - We have 2 nested for loops that run in total of n\*C times.
 - **Space complexity: O(n\*C)** - We are caching n\*C results in our 2D matrix/array.
 
