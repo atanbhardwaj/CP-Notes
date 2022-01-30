@@ -219,6 +219,11 @@ Given:
 - **h<sub>1</sub> h<sub>2</sub> … h <sub>N</sub>**
 
 ### Brute-Force/Recursive Approach
+- Note: the values of the given height array is used as height[i], height[i+1] ... height[n-1] and represented as height<sub>1</sub>, height<sub>2</sub> and so on in the explaination below.
+  
+- The totalCost variable is used to store the minimum possible total cost incurred when the frog reached the last stone. 
+  
+There are `n` stones given, `1,2,3,...,N`. Given that the frog is initially on stone `1` **say [i]** and it has two possible choices, that is either it can jump on stone `2` or `3` let us say the frog jumps on stone `2` **([i+1])** and the cost incurred is **|height<sub>1</sub> - height<sub>2</sub>|** else if it makes the other choice, that is to jump on stone `3` then the cost incurred is **|height<sub>1</sub> - height<sub>2</sub>|** and now we will have to take the minimum of both these values that is **min(**|h<sub>1</sub> - h<sub>2</sub>|**, **|height<sub>1</sub> - height<sub>2</sub>|**)** and add this value to the totalCost incurred and then explore all the other possibilities similarly from stone 2 and stone 3 all the way to stone n. So, here we get the recurrence relation as, R<sub>x</sub> = min(|height<sub>x</sub> - height<sub>(x-1)</sub>| + R<sub>(x-1)</sub>, |height<sub>x</sub> - height<sub>(x-2)</sub>| + R<sub>(x-2)</sub>). So, in a brute force manner we can explore all the possible answers and update the totalCost after reaching at the last stone.
 
 **Code: C++**
 
@@ -227,35 +232,35 @@ Given:
 #include <bits/stdc++.h>
 using namespace std;
 
-void minimumPossibleCostIncurred(int *arr, int &answer, int cost, int index, int n)
+void minimumPossibleCostIncurred(int *height, int &totalCost, int cost, int index, int n)
 {
     if (index >= n)
         return;
 
     if (index == n - 1)
     {
-        answer = min(answer, cost);
+        totalCost = min(totalCost, cost);
         return;
     }
 
-    minimumPossibleCostIncurred(arr, answer, cost + abs(arr[index] - arr[index + 1]), index + 1, n);
-    minimumPossibleCostIncurred(arr, answer, cost + abs(arr[index] - arr[index + 2]), index + 2, n);
+    minimumPossibleCostIncurred(height, totalCost, cost + abs(height[index] - height[index + 1]), index + 1, n);
+    minimumPossibleCostIncurred(height, totalCost, cost + abs(height[index] - height[index + 2]), index + 2, n);
 }
 
 int32_t main()
 {
     int n;
     cin >> n;
-    int arr[n];
+    int height[n];
     for (int i = 0; i < n; i++)
-        cin >> arr[i];
+        cin >> height[i];
 
-    int answer = INT_MAX;
+    int totalCost = INT_MAX;
     int cost = 0;
 
-    minimumPossibleCostIncurred(arr, answer, cost, 0, n);
+    minimumPossibleCostIncurred(height, totalCost, cost, 0, n);
 
-    cout << answer;
+    cout << totalCost;
 }
 ``` 
 
