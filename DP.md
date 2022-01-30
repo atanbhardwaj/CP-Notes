@@ -300,7 +300,7 @@ int topdown(vector<int> &h, int i)
 		return dp[i] = 0;
 	if (i == 1)
 		return dp[i] = abs(h[1] - h[0]);
-	return dp[i] = min(abs(h[i] - h[i - 1]) + recursive(h, i - 1), abs(h[i] - h[i - 2]) + recursive(h, i - 2));
+	return dp[i] = min(abs(h[i] - h[i - 1]) + topdown(h, i - 1), abs(h[i] - h[i - 2]) + topdown(h, i - 2));
 }
 
 int main()
