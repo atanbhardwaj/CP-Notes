@@ -208,6 +208,54 @@ int main()
 ## Frog 1 [Atcoder Educational Dp Contest]
 
 ### Problem Statement
-There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is **h <sub>i</sup>**. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
-If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of **∣h <sub>i</sub> − h <sub>j</sub>∣** is incurred, where `j` is the stone to land on. 
+There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is **h<sub>i</sup>**. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
+If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of **∣h<sub>i</sub> − h<sub>j</sub>∣** is incurred, where `j` is the stone to land on. 
 Find the minimum possible total cost incurred before the frog reaches Stone `N`.
+
+
+Given:
+
+- `N`
+- h<sub>1</sub> h<sub>2</sub> … h <sub>N</sub>
+
+### Brute-Force/Recursive Approach
+
+**Code: C++**
+
+```
+C++
+
+#include <bits/stdc++.h>
+using namespace std;
+
+void solve(int *arr, int &answer, int cost, int index, int n)
+{
+    if (index >= n)
+        return;
+
+    if (index == n - 1)
+    {
+        answer = min(answer, cost);
+        return;
+    }
+
+    solve(arr, answer, cost + abs(arr[index] - arr[index + 1]), index + 1, n);
+    solve(arr, answer, cost + abs(arr[index] - arr[index + 2]), index + 2, n);
+}
+
+int32_t main()
+{
+    int n;
+    cin >> n;
+    int arr[n];
+    for (int i = 0; i < n; i++)
+        cin >> arr[i];
+
+    int answer = INT_MAX;
+    int cost = 0;
+
+    solve(arr, answer, cost, 0, n);
+
+    cout << answer;
+}
+``` 
