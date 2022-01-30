@@ -283,19 +283,20 @@ Say `N` is given as `4` and the height array is given {heights} `10 30 40 20` . 
 
 ```
                                 R(heights,totalCost, cost, index, n)
-                                    K(heights,INT_MAX,0, 0, 4)  
+                                    R(heights,INT_MAX,0, 0, 4)  
                                     /                       \ 
                                     /                       \               
                 R(h,INT_MAX,20, 1, 4)                  R(h,INT_MAX,30, 2, 4) 
                     /           \                           /               \ 
                     /           \                           /                   \
-    R(h,INT_MAX,30, 2, 4)      R(h,INT_MAX,40,3,4)    R(h,INT_MAX,50,3 ,4)       [Restricted call due index out of bound]
+    R(h,INT_MAX,30, 2, 4)      R(h,INT_MAX,40,3,4)    R(h,INT_MAX,50,3 ,4)       [Restricted calls due index out of bound]
         /           \               /   \              /        
         /               \           /       \          /            
 R(h,INT_MAX,50,3, 4)      [Restricted calls due index out of bound]              
 ```
 Now, as we can see that `R(h,INT_MAX,30, 2, 4)` and `R(h,INT_MAX,50,3 ,4)` function calls are repeated multiple times. So, we just need to cache this result once calculated to avoid repeating the same call. Hence, we can define our dp array which is going to cache the result of each state which defines at a certain index what is the minimum possible cost incurred and the dp array is of size `n` because we have total `n` stones given. So, just add a dp array and memoize the result once calculated and then before calculating the result just check if dp array has the answer already or not. If yes, then return the stored answer and no need to make the function call. Else compute the result.
 
+**Code: C++**
 
 ```C++
 #include <bits/stdc++.h>
@@ -336,3 +337,64 @@ int32_t main()
 
 }
 ```
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible calls is n (For each item, we have to explore for all stones <= N)
+
+- **Space complexity: O(n) [Dp array of size N] + O(n) size of recursive call stack)** - We are caching n results in our dp array.
+
+
+### Bottom-Up (Tabular)
+
+Now this part becomes simple, here we just need to translate the recursive memoized code to simple iterative code. Here, you'll find the conditions same as we used in the above memoization code. Now, since we discussed that here in this problem, each index/dp state defines about the minimum cost incurred to reach at that particular index. So, here we are sure that to reach the last index and if we start from the last index itself then the cost incurred will be zero. Right? Hence, we can come up with a formula for each state of the dp array:
+
+- `dp[i] = min(abs(heights[i] - heights[i + 1]) + dp[i + 1], abs(heights[i] - heights[i + 2]) + dp[i + 2])`
+
+and we can move from the last index and keep calculating the cost for each dp state and then return the cost incurred when we reach at the 0th index [according to the question 1<sup>st</sup> stone]. So, simply we can return dp[0] as our final cost incurred to reach to the last stone.
+
+**Code: C++**
+
+```C++
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
+
+int minimumPossibleCostIncurred(int *heights, int n)
+{
+    int dp[n];
+ 
+    for (int i = 0; i < n; i++)
+        dp[i] = 0;
+ 
+    for (int i = n - 2; i >= 0; i--)
+    {
+        if (i == n - 2)
+            dp[i] = abs(heights[i + 1] - heights[i]);
+        else
+            dp[i] = min(abs(heights[i] - heights[i + 1]) + dp[i + 1], abs(heights[i] - heights[i + 2]) + dp[i + 2]);
+    }
+ 
+    return dp[0];
+}
+ 
+int32_t main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    scanf("%d",&n);
+    int heights[n];
+    for (int i = 0; i < n; i++)
+        scanf("%d",&heights[i]);
+    printf("%d", minimumPossibleCostIncurred(heights, n));
+}
+```
+
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - We have single for loop that run in total of n times.
+- **Space complexity: O(n)** - We are caching n results in our Dp array.
