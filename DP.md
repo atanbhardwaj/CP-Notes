@@ -14,10 +14,10 @@ Given:
 - `P : [P0, P1, ... Pn-1]`
 
 <!--
-|                   |               |               |     |                 |
-|  :-------------:  |:-------------:|:-------------:|:---:|:---------------:|
-| **Weight (W):**   | W<sub>0</sub> | W<sub>1</sub> | ... | W<sub>n-1</sub> |
-| **Profit (P):**   | P<sub>0</sub> | P<sub>1</sub> | ... | P<sub>n-1</sub> |
+|                 |               |               |       |                 |
+| :-------------: | :-----------: | :-----------: | :---: | :-------------: |
+| **Weight (W):** | W<sub>0</sub> | W<sub>1</sub> |  ...  | W<sub>n-1</sub> |
+| **Profit (P):** | P<sub>0</sub> | P<sub>1</sub> |  ...  | P<sub>n-1</sub> |
 -->
 
 ### Brute-Force/Recursive Approach
@@ -204,3 +204,197 @@ int main()
 - **Time complexity: O(n\*C)** - We have 2 nested for loops that run in total of n\*C times.
 - **Space complexity: O(n\*C)** - We are caching n\*C results in our 2D matrix/array.
 
+
+## <a href="https://atcoder.jp/contests/dp/tasks/dp_a"> Frog 1</a> [Atcoder Educational Dp Contest]
+
+### Problem Statement
+There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is **h<sub>i</sup>**. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
+If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of **∣h<sub>i</sub> − h<sub>j</sub>∣** is incurred, where `j` is the stone to land on. 
+Find the minimum possible total cost incurred before the frog reaches Stone `N`.
+
+
+Given:
+
+- `N`
+- **h<sub>1</sub> h<sub>2</sub> … h <sub>N</sub>**
+
+### Brute-Force/Recursive Approach
+- Note: the values of the given height array is used as height[i], height[i+1] ... height[n-1] and represented as height<sub>1</sub>, height<sub>2</sub> and so on in the explaination below.
+  
+- The totalCost variable is used to store the minimum possible total cost incurred when the frog reached the last stone. 
+  
+There are `n` stones given, `1,2,3,...,N`. Given that the frog is initially on stone `1` **say [i]** and it has two possible choices, that is either it can jump on stone `2` or `3` let us say the frog jumps on stone `2` **([i+1])** and the cost incurred is **|height<sub>1</sub> - height<sub>2</sub>|** else if it makes the other choice, that is to jump on stone `3` then the cost incurred is **|height<sub>1</sub> - height<sub>2</sub>|** and now we will have to take the minimum of both these values that is **min(**|h<sub>1</sub> - h<sub>2</sub>|**, **|height<sub>1</sub> - height<sub>2</sub>|**)** and add this value to the totalCost incurred and then explore all the other possibilities similarly from stone 2 and stone 3 all the way to stone n. So, here we get the recurrence relation as, 
+
+- **R<sub>x</sub> = min( |height<sub>x</sub> - height<sub>(x-1)</sub>| + R<sub>(x-1)</sub> <b>,</b> |height<sub>x</sub> - height<sub>(x-2)</sub>| + R<sub>(x-2)</sub>)**
+
+
+So, in a brute force manner we can explore all the possible answers and update the totalCost after reaching at the last stone.
+
+**Code: C++**
+
+```C++
+
+#include <bits/stdc++.h>
+using namespace std;
+
+void minimumPossibleCostIncurred(int *height, int &totalCost, int cost, int index, int n)
+{
+    if (index >= n)
+        return;
+
+    if (index == n - 1)
+    {
+        totalCost = min(totalCost, cost);
+        return;
+    }
+
+    minimumPossibleCostIncurred(height, totalCost, cost + abs(height[index] - height[index + 1]), index + 1, n);
+    minimumPossibleCostIncurred(height, totalCost, cost + abs(height[index] - height[index + 2]), index + 2, n);
+}
+
+int32_t main()
+{
+    int n;
+    cin >> n;
+    int height[n];
+    for (int i = 0; i < n; i++)
+        cin >> height[i];
+
+    int totalCost = INT_MAX;
+    int cost = 0;
+
+    minimumPossibleCostIncurred(height, totalCost, cost, 0, n);
+
+    cout << totalCost;
+}
+``` 
+
+**Complexity Analysis**
+
+- **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
+- **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
+
+
+
+### Recursive (Top-down) + Memoization
+
+Let us take an example:
+Say `N` is given as `4` and the height array is given {heights} `10 30 40 20` . Now according to our previous solution which explored all the possible options, the recurrence tree would look like as below:
+
+```
+                                R(heights,totalCost, cost, index, n)
+                                    R(heights,INT_MAX,0, 0, 4)  
+                                    /                       \ 
+                                    /                       \               
+                R(h,INT_MAX,20, 1, 4)                  R(h,INT_MAX,30, 2, 4) 
+                    /           \                           /               \ 
+                    /           \                           /                   \
+    R(h,INT_MAX,30, 2, 4)      R(h,INT_MAX,40,3,4)    R(h,INT_MAX,50,3 ,4)       [Restricted calls due index out of bound]
+        /           \               /   \              /        
+        /               \           /       \          /            
+R(h,INT_MAX,50,3, 4)      [Restricted calls due index out of bound]              
+```
+Now, as we can see that `R(h,INT_MAX,30, 2, 4)` and `R(h,INT_MAX,50,3 ,4)` function calls are repeated multiple times. So, we just need to cache this result once calculated to avoid repeating the same call. Hence, we can define our dp array which is going to cache the result of each state which defines at a certain index what is the minimum possible cost incurred and the dp array is of size `n` because we have total `n` stones given. So, just add a dp array and memoize the result once calculated and then before calculating the result just check if dp array has the answer already or not. If yes, then return the stored answer and no need to make the function call. Else compute the result.
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int minimumPossibleCostIncurred(int *height, int index, int *dp, int n)
+{
+    if (index >= n - 1)
+        return 0;
+
+    if (dp[index] != INT_MAX)
+        return dp[index];
+
+    int costOne = INT_MAX, costTwo = INT_MAX;
+
+    costOne = abs(height[index] - height[index + 1]) + minimumPossibleCostIncurred(height, index + 1, dp, n);
+
+    if (index + 2 < n)
+        costTwo = abs(height[index] - height[index + 2]) + minimumPossibleCostIncurred(height, index + 2, dp, n);
+
+    return dp[index] = min(costOne, costTwo);
+}
+
+int32_t main()
+{
+    int n;
+    cin >> n;
+    int height[n];
+    for (int i = 0; i < n; i++)
+        cin >> height[i];
+        
+    int dp[n];
+
+    for (int i = 0; i < n; i++)
+        dp[i] = INT_MAX;
+
+    cout << minimumPossibleCostIncurred(height, 0, dp, n);
+
+}
+```
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible calls is n (For each item, we have to explore for all stones <= N)
+
+- **Space complexity: O(n) [Dp array of size N] + O(n) size of recursive call stack)** - We are caching n results in our dp array.
+
+
+### Bottom-Up (Tabular)
+
+Now this part becomes simple, here we just need to translate the recursive memoized code to simple iterative code. Here, you'll find the conditions same as we used in the above memoization code. Now, since we discussed that here in this problem, each index/dp state defines about the minimum cost incurred to reach at that particular index. So, here we are sure that to reach the last index and if we start from the last index itself then the cost incurred will be zero. Right? Hence, we can come up with a formula for each state of the dp array:
+
+- `dp[i] = min(abs(heights[i] - heights[i + 1]) + dp[i + 1], abs(heights[i] - heights[i + 2]) + dp[i + 2])`
+
+and we can move from the last index and keep calculating the cost for each dp state and then return the cost incurred when we reach at the 0th index [according to the question 1<sup>st</sup> stone]. So, simply we can return dp[0] as our final cost incurred to reach to the last stone.
+
+**Code: C++**
+
+```C++
+#include <iostream>
+#include <cmath>
+#include <algorithm>
+
+using namespace std;
+
+int minimumPossibleCostIncurred(int *heights, int n)
+{
+    int dp[n];
+ 
+    for (int i = 0; i < n; i++)
+        dp[i] = 0;
+ 
+    for (int i = n - 2; i >= 0; i--)
+    {
+        if (i == n - 2)
+            dp[i] = abs(heights[i + 1] - heights[i]);
+        else
+            dp[i] = min(abs(heights[i] - heights[i + 1]) + dp[i + 1], abs(heights[i] - heights[i + 2]) + dp[i + 2]);
+    }
+ 
+    return dp[0];
+}
+ 
+int32_t main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    scanf("%d",&n);
+    int heights[n];
+    for (int i = 0; i < n; i++)
+        scanf("%d",&heights[i]);
+    printf("%d", minimumPossibleCostIncurred(heights, n));
+}
+```
+
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - We have single for loop that run in total of n times.
+- **Space complexity: O(n)** - We are caching n results in our Dp array.
