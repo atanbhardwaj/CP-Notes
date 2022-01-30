@@ -208,7 +208,7 @@ int main()
 ## Frog 1 [Atcoder Educational Dp Contest]
 
 ### Problem Statement
-There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is `h(<sub>i</sub>)`. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
-If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of `∣h<sub>i</sub> − h<sub>j</sub>∣` is incurred, where `j` is the stone to land on. 
-Find the minimum possible total cost incurred before the frog reaches Stone `N`.
+There are `N` stones, numbered `1,2,…,N`. For each `i` (**1≤i≤N**), the height of Stone `i` is `h`<sub>i</sup>. There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
+If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of `∣h<sub>i</sub> − h <sub>j</sub> ∣` is incurred, where `j` is the stone to land on. 
+Find the minimum possible total cost incurred before the frog reaches Stone `N`. <sub>subscript</sub>
 
