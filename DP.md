@@ -222,8 +222,7 @@ Given:
 
 **Code: C++**
 
-```
-C++
+```C++
 
 #include <bits/stdc++.h>
 using namespace std;
