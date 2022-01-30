@@ -227,7 +227,7 @@ Given:
 #include <bits/stdc++.h>
 using namespace std;
 
-void solve(int *arr, int &answer, int cost, int index, int n)
+void minimumPossibleCostIncurred(int *arr, int &answer, int cost, int index, int n)
 {
     if (index >= n)
         return;
@@ -238,8 +238,8 @@ void solve(int *arr, int &answer, int cost, int index, int n)
         return;
     }
 
-    solve(arr, answer, cost + abs(arr[index] - arr[index + 1]), index + 1, n);
-    solve(arr, answer, cost + abs(arr[index] - arr[index + 2]), index + 2, n);
+    minimumPossibleCostIncurred(arr, answer, cost + abs(arr[index] - arr[index + 1]), index + 1, n);
+    minimumPossibleCostIncurred(arr, answer, cost + abs(arr[index] - arr[index + 2]), index + 2, n);
 }
 
 int32_t main()
@@ -253,7 +253,7 @@ int32_t main()
     int answer = INT_MAX;
     int cost = 0;
 
-    solve(arr, answer, cost, 0, n);
+    minimumPossibleCostIncurred(arr, answer, cost, 0, n);
 
     cout << answer;
 }
