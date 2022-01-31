@@ -239,18 +239,6 @@ int main()
 <a name="frog_1"></a>
 ### [Frog1](https://atcoder.jp/contests/dp/tasks/dp_a)
 
-#### Problem Statement
-There are `N` stones, numbered `1,2,…,N`. For each `i (1 <= i <= N)`, the height of Stone `i` is `hi`. 
-
-There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
-- If the frog is currently on Stone `i`, jump to Stone `i+1` or Stone `i+2`. Here, a cost of `|hi - hj|` is incurred, where `j` is the stone to land on. 
-
-Find the minimum possible total cost incurred before the frog reaches Stone `N`.
-
-Given:
-- `N`
-- `h1, h2, ... hN`
-
 #### Brute-Force/Recursive Approach
 We know that from given `h[i]`, we can only go to either `h[i+1]` or `h[i+2]`. If we reverse this logic, we can see that from any given `h[i]`, we can only arrive there either from `h[i-1]` or `h[i-2]`. Finally, the cost of arriving at `h1` is 0 (since we are already there when we start) and `h1` is `|h[1] - h[0]|` since we can only come to `h1` from `h0`
 
@@ -405,18 +393,6 @@ int main()
 <a name="frog_2"></a>
 ### [Frog2](https://atcoder.jp/contests/dp/tasks/dp_b)
 
-#### Problem Statement
-There are `N` stones, numbered `1,2,…,N`. For each `i (1 <= i <= N)`, the height of Stone `i` is `hi`. 
-
-There is a frog who is initially on Stone `1`. He will repeat the following action some number of times to reach Stone `N`: 
-- If the frog is currently on Stone `i`, jump to one of the following: Stone `i+1`,`i+2`,…,`i+K`. Here, a cost of `|hi - hj|` is incurred, where `j` is the stone to land on. 
-
-Find the minimum possible total cost incurred before the frog reaches Stone `N`.
-
-Given:
-- `N`
-- `K`
-- `h1, h2, ... hN`
 
 #### Brute-Force/Recursive Approach
 Similar to [Frog1](#frog_1), we know that if a frog can jump `k` stones ahead from a stone `i`, this also implies that a frog can only reach stone `i` by jumping from the previous `k` stones.
@@ -513,7 +489,7 @@ From the recurrence relation, we can come up with the bottom up approach:
 ```
 Base Case:
 if (i == 0)
-	return 0;
+	return dp[i] = 0;
 	
 Recurrence Relation:
 	dp[i] = max(dp[i], abs(h[i] - h[j]) + dp[j]) -> for all j in range [i-k, i)
@@ -550,6 +526,209 @@ int main()
 		cin >> h[i];
 
 	cout << bottomup(h, k);
+	return 0;
+}
+```
+
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - We have single for loop that run in total of n times.
+- **Space complexity: O(n)** - We are caching n results in our DP array.
+
+
+
+
+
+
+<br />
+<br />
+<br />
+<br />
+
+
+
+
+
+
+<a name="vacation"></a>
+### [Vacation](https://atcoder.jp/contests/dp/tasks/dp_c)
+
+#### Brute-Force/Recursive Approach
+We know that we cannot take any given activity for two or more days in a row. So our decision to choose an activity will depend on what our previous decisions were: 
+we will pass two parameters in our recursive function: `i` and `j`. Here, `i` denotes the `i`th day and `j` denotes the activity choosen on the `i+1`th day (`0->A, 1->B, 2->C`). Our basic logic is: we will only consider activities on the `i`th day that don't equal `j` because we already chose that on the next day. Therefore, the maximum points we can gain is by choosing one of the two remaining activities for the `i`th day plus the profit from the previous days (recursively).
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int recursive(vector<vector<int>> &act, int i, int j)
+{
+	int res = 0;
+	if (i < 0)
+		return res;
+	if (i == 0)
+	{
+		for (int a = 0; a <= 2; ++a)
+		{
+			if (a == j) continue;
+			res = max(res, act[a][0]);
+		}
+		return res;
+	}
+
+	for (int a = 0; a <= 2; ++a)
+	{
+		if (a == j)
+			continue;
+		res = max(res, act[a][i] + recursive(act, i - 1, a));
+	}
+	return res;
+}
+
+int main()
+{
+	int n;
+	cin >> n;
+	vector<vector<int>> act(3, vector<int>(n));
+	for (int i = 0; i < n; ++i)
+		cin >> act[0][i] >> act[1][i] >> act[2][i];
+
+	cout << max({recursive(act, n - 2, 0) + act[0][n - 1],
+				 recursive(act, n - 2, 1) + act[1][n - 1],
+				 recursive(act, n - 2, 2) + act[2][n - 1]});
+}
+``` 
+
+**Complexity Analysis**
+
+- **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
+- **Space complexity: O(n)** - The depth of the recursion tree can go up to n.
+
+<br />
+<br />
+
+#### Recursive (Top-down) + Memoization
+
+Here, we cache the results of the recursive brute-force approach to reduce time complexity:
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int n;
+int topdown(vector<vector<int>> &act, int i, int j)
+{
+	static vector<vector<int>> dp(3, vector<int>(n, -1));
+	if(dp[j][i] != -1) return dp[j][i];
+	int res = 0;
+	if (i < 0)
+		return dp[j][i] = res;
+	if (i == 0)
+	{
+		for (int a = 0; a <= 2; ++a)
+		{
+			if (a == j) continue;
+			res = max(res, act[a][0]);
+		}
+		return dp[j][i] = res;
+	}
+
+	for (int a = 0; a <= 2; ++a)
+	{
+		if (a == j)
+			continue;
+		res = max(res, act[a][i] + topdown(act, i - 1, a));
+	}
+	return dp[j][i] = res;
+}
+
+int main()
+{
+	cin >> n;
+	vector<vector<int>> act(3, vector<int>(n));
+	for (int i = 0; i < n; ++i)
+		cin >> act[0][i] >> act[1][i] >> act[2][i];
+
+	cout << max({topdown(act, n - 2, 0) + act[0][n - 1],
+				 topdown(act, n - 2, 1) + act[1][n - 1],
+				 topdown(act, n - 2, 2) + act[2][n - 1]});
+}
+```
+
+**Complexity Analysis**
+
+- **Time complexity: O(n)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible calls is 3*n (We need to explore the max profit at any day given we take each activity)
+
+- **Space complexity: O(n + size of recursive call stack)** - We are caching n results in our DP array.
+
+<br />
+<br />
+
+#### Bottom-Up (Tabular)
+
+From the recurrence relation, we can come up with the bottom up approach:
+```
+Base cases:
+if (i < 0)
+	return dp[j][i] = 0;
+if (i == 0)
+{
+	for (int a = 0; a <= 2; ++a)
+	{
+		if (a == j) continue;
+		dp[j][i] = max(dp[j][i], act[a][0]);
+	}
+	return dp[j][i];
+}
+
+Recurrence Relation:
+
+for (int a = 0; a <= 2; ++a)
+{
+	if (a == j) continue;
+	dp[j][i] = max(dp[j][i], act[a][i] + topdown(act, i - 1, a));
+}
+return dp[j][i];
+```
+
+
+**Code: C++**
+
+```C++
+#include <bits/stdc++.h>
+using namespace std;
+
+int n;
+int bottomup(vector<vector<int>> &act)
+{
+	vector<vector<int>> dp(3, vector<int>(n + 1));
+
+	for (int i = 1; i <= n; ++i)
+	{
+		int a = act[0][i-1], b = act[1][i-1], c = act[2][i-1];
+		dp[0][i] = max(dp[1][i - 1] + b,
+					   dp[2][i - 1] + c);
+		dp[1][i] = max(dp[0][i - 1] + a,
+					   dp[2][i - 1] + c);
+		dp[2][i] = max(dp[0][i - 1] + a,
+					   dp[1][i - 1] + b);
+	}
+	return max({dp[0][n], dp[1][n], dp[2][n]});
+}
+ 
+int main()
+{
+	cin >> n;
+	vector<vector<int>> act(3, vector<int>(n));
+	for (int i = 0; i < n; ++i)
+		cin >> act[0][i] >> act[1][i] >> act[2][i];
+		
+	cout << bottomup(act);
 	return 0;
 }
 ```
