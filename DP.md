@@ -270,7 +270,7 @@ int main()
 }
 ``` 
 
-**Code: Python**
+**Code: Python3**
 ```python
 
 n = int(input())
@@ -336,6 +336,35 @@ int main()
 }
 ```
 
+
+**Code: Python3**
+
+```python
+n = int(input())
+nums = list(map(int, input().strip().split()))
+
+def topDown(nums):
+
+    n = len(nums)
+    dp = [-1 for x in range(0, n)]
+
+    def helper(index):
+        if dp[index] != -1:
+            return dp[index]
+        if index == 0:
+            dp[index] = 0
+            return dp[index]
+        if index == 1:
+            dp[index] = abs(nums[1] - nums[0])
+            return dp[index]
+
+        dp[index] = min(abs(nums[index] - nums[index - 1]) + helper(index - 1), abs(nums[index] - nums[index - 2]) + helper(index - 2))
+        return dp[index]
+    
+    return helper(n - 1)
+	
+print(topDown(nums))
+```
 **Complexity Analysis**
 
 - **Time complexity: O(n)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible calls is n (We have to explore each stone)
