@@ -567,6 +567,29 @@ int main()
 }
 ``` 
 
+**Code: Python3**
+
+```python
+import math
+n, k = input().split()
+n = int(n)
+k = int(k)
+h = list(map(int, input().strip().split()))
+
+def recursive(h, k, i):
+    
+    if i == 0:
+        return 0
+    
+    res = math.inf
+    for j in range (max(0, i - k), i):
+        res = min(res, abs(h[i] - h[j]) + recursive(h, k, j))
+
+    return res
+    
+print(recursive(h, k, n-1))
+```
+
 **Complexity Analysis**
 
 - **Time complexity: O(n<sup>k</sup>)** - Size of recursion tree will be n<sup>k</sup>
@@ -611,6 +634,34 @@ int main()
 	cout << topdown(h, k, n-1);
 	return 0;
 }
+```
+
+**Code: Python3**
+
+```python
+import math
+n, k = input().split()
+n = int(n)
+k = int(k)
+h = list(map(int, input().strip().split()))
+
+dp = [-1 for x in range(0, n)]
+
+def topdown(h, k, i):
+    if dp[i] != -1:
+        return dp[i]
+    if i == 0:
+        dp[i] = 0
+        return dp[i]
+    
+    res = math.inf
+    for j in range(max(0, i-k), i):
+        res = min(res, abs(h[i]-h[j]) + topdown(h, k, j))
+    
+    dp[i] = res
+    return dp[i]
+
+print(topdown(h, k, n-1))
 ```
 
 **Complexity Analysis**
@@ -669,6 +720,29 @@ int main()
 }
 ```
 
+**Code: Python3**
+
+```python
+import math
+n, k = input().split()
+n = int(n)
+k = int(k)
+h = list(map(int, input().strip().split()))
+
+def bottomup(h, k):
+    n = len(h)
+
+    dp = [math.inf for x in range(0, n)]
+
+    dp[0] = 0
+    for i in range(1, n):
+        for j in range(max(0, i - k), i):
+            dp[i] = min(dp[i], abs(h[i] - h[j]) + dp[j])
+    
+    return dp[n -1]
+
+print(bottomup(h, k))
+```
 
 **Complexity Analysis**
 
