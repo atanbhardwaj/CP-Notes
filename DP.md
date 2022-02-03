@@ -162,6 +162,30 @@ int main()
     return 0;
 }
 ```
+
+**Code: Python3**
+```python
+W = [7, 2, 4]
+P = [10, 5, 6]
+C = 7
+
+dp = {}
+def knapsack(W, P, Space, i):
+    if (i, Space) in dp.keys():
+        return dp[{i, Space}]
+    if i == -1 or Space == 0:
+        dp[(i, Space)] = 0
+        return dp[(i, Space)]
+    if  W[i] > Space:
+        dp[(i, Space)] = knapsack(W, P, Space, i - 1)
+        return dp[(i, Space)]
+    else:
+        dp[(i, Space)] = max(knapsack(W, P, Space, i - 1),	
+                    P[i] + knapsack(W, P, Space - W[i], i - 1))
+    return dp[(i, Space)]
+    
+print(knapsack(W, P, C, len(W) - 1))
+```
 **Complexity Analysis**
 
 - **Time complexity: O(n\*C)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible queries is n\*C (For each item, we have to explore for all capacities <= C)
