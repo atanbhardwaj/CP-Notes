@@ -85,6 +85,7 @@ def knapsack(W,P, Space, i):
 
 print(knapsack(W, P, C, len(W) - 1))
 ```
+
 **Complexity Analysis**
 
 - **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
@@ -186,6 +187,7 @@ def knapsack(W, P, Space, i):
     
 print(knapsack(W, P, C, len(W) - 1))
 ```
+
 **Complexity Analysis**
 
 - **Time complexity: O(n\*C)** - This is because the recursive function will only branch or call other recursive functions if it hasn't cached the query yet. The number of possible queries is n\*C (For each item, we have to explore for all capacities <= C)
@@ -250,6 +252,31 @@ int main()
     return 0;
 }
 ```
+
+**Code: Python3**
+
+```python
+W = [7, 2, 4]
+P = [10, 5, 6]
+C = 7
+
+def knapsack(W, P, C):
+    n = len(W)
+    dp = [[0 for x in range(0, C+1)] for r in range(0, n+1)]
+
+	# dp[0][Space] = 0 and dp[i][0] = 0 (by default in matrix)
+	
+    for i in range(1, n+1):
+        for Space in range(1, C+1):
+            if W[i - 1] > Space:
+                dp[i][Space] = dp[i - 1][Space]
+            else:
+                dp[i][Space] = max(dp[i - 1][Space], P[i - 1] + dp[i - 1][Space - W[i - 1]])
+    return dp[n][C]
+    
+print(knapsack(W, P, C))
+```
+
 **Complexity Analysis**
 
 - **Time complexity: O(n\*C)** - We have 2 nested for loops that run in total of n\*C times.
