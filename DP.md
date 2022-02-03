@@ -66,6 +66,25 @@ int main()
     return 0;
 }
 ```
+
+**Code: Python3**
+```python
+W = [7, 2, 4]
+P = [10, 5, 6]
+C = 7
+
+def knapsack(W,P, Space, i):
+    if i == -1 or Space == 0:
+        return 0
+    if W[i] > Space: 
+        return knapsack(W, P, Space, i - 1)
+    else:
+        return max(knapsack(W, P, Space, i - 1),                
+                   P[i] + knapsack(W, P, Space - W[i], i - 1))
+
+
+print(knapsack(W, P, C, len(W) - 1))
+```
 **Complexity Analysis**
 
 - **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
