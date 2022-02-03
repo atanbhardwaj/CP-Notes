@@ -270,6 +270,29 @@ int main()
 }
 ``` 
 
+**Code: Python**
+```python
+
+n = int(input())
+nums = list(map(int, input().strip().split()))
+
+def recursive(nums):
+    n = len(nums)
+
+    def helper(index):
+
+        if index == 0:
+            return 0
+        if index == 1:
+            return abs(nums[1] - nums[0])
+	    
+        return min(abs(nums[index] - nums[index - 1]) + helper(index - 1), abs(nums[index] - nums[index - 2]) + helper(index - 2))
+    
+    return helper(n - 1)
+
+print(recursive(nums))
+```
+
 **Complexity Analysis**
 
 - **Time complexity: O(2<sup>n</sup>)** - Size of recursion tree will be 2<sup>n</sup>
