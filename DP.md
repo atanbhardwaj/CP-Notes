@@ -362,7 +362,7 @@ def topDown(nums):
         return dp[index]
     
     return helper(n - 1)
-	
+
 print(topDown(nums))
 ```
 **Complexity Analysis**
@@ -419,7 +419,24 @@ int main()
 	return 0;
 }
 ```
+**Code: Python3**
 
+```python
+n = int(input())
+nums = list(map(int, input().strip().split()))
+
+def bottomUp(nums, n):
+    dp = [0 for x in range(0, n)]
+    for i in range(n-2, -1, -1):
+        if i == n - 2:
+            dp[i] = abs(nums[i + 1] - nums[i])
+        else:
+            dp[i] = min(abs(nums[i] - nums[i + 1]) + dp[i + 1], abs(nums[i] - nums[i + 2]) + dp[i + 2])
+
+    return dp[0]
+    
+print(bottomUp(nums))
+```
 
 **Complexity Analysis**
 
